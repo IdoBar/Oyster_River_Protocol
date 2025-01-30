@@ -43,7 +43,7 @@ RUN usermod -aG sudo orp \
 #########
 WORKDIR /home/orp
 USER orp
-RUN git clone https://github.com/macmanes-lab/Oyster_River_Protocol.git && cd Oyster_River_Protocol && sudo make && sed -i  "s_ubuntu_orp_g" /home/orp/Oyster_River_Protocol/software/config.ini
+RUN git clone https://github.com/idobar/Oyster_River_Protocol.git && cd Oyster_River_Protocol && sudo make && sed -i  "s_ubuntu_orp_g" /home/orp/Oyster_River_Protocol/software/config.ini
 
 #########
 ### Path
@@ -51,6 +51,7 @@ RUN git clone https://github.com/macmanes-lab/Oyster_River_Protocol.git && cd Oy
 RUN echo 'PATH=$PATH:/home/orp/Oyster_River_Protocol/software/anaconda/install/bin' >> /home/orp/.profile \
     && echo 'PATH=$PATH:/home/orp/Oyster_River_Protocol/software/OrthoFinder/orthofinder' >> /home/orp/.profile \
     && echo 'PATH=$PATH:/home/orp/Oyster_River_Protocol/software/orp-transrate' >> /home/orp/.profile \
+    && echo "unset -f which" >> >> /home/orp/.profile \
     && /bin/bash -c "source /home/orp/.profile"
 ENV PATH="/home/orp/Oyster_River_Protocol/software/transabyss:/home/orp/Oyster_River_Protocol/software/anaconda/install/bin:/home/orp/Oyster_River_Protocol/software/orp-transrate:/home/orp/Oyster_River_Protocol/software/OrthoFinder/orthofinder:/home/orp/Oyster_River_Protocol/software/anaconda/install/bin:${PATH}"
 

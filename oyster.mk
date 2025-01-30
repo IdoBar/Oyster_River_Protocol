@@ -24,13 +24,13 @@ BUSCO := ${shell which busco}
 BUSCODIR := $(dir $(firstword $(BUSCO)))
 RUNOUT=USER_RUN
 LINEAGE=eukaryota_odb10
-BUSCODB :=
+BUSCODB := ${MAKEDIR}/busco_dbs
 START=1
 STRAND :=
 TPM_FILT = 0
 BUSCO_CONFIG_FILE := ${MAKEDIR}/software/config.ini
 export BUSCO_CONFIG_FILE
-VERSION := ${shell cat  ${MAKEDIR}version.txt}
+VERSION := ${shell cat  ${MAKEDIR}/version.txt}
 LOWEXPFILE=${DIR}/assemblies/working/${RUNOUT}.LOWEXP.txt
 RED:=$(shell tput setaf 1)
 reset:=$(shell tput sgr0)
@@ -431,7 +431,7 @@ ${DIR}/assemblies/${RUNOUT}.ORP.fasta:${DIR}/assemblies/${RUNOUT}.filter.done ${
 
 ${DIR}/reports/${RUNOUT}.busco.done:${DIR}/assemblies/${RUNOUT}.ORP.fasta
 	source activate orp_busco;\
-	python $$(which busco) --offline --lineage ${MAKEDIR}/busco_dbs/${LINEAGE} -i ${DIR}/assemblies/${RUNOUT}.ORP.fasta -m transcriptome --cpu ${BUSCO_THREADS} -o run_${RUNOUT}.ORP --config ${MAKEDIR}/software/config.ini
+	python $$(which busco) --offline --lineage ${BUSCODB}/${LINEAGE} -i ${DIR}/assemblies/${RUNOUT}.ORP.fasta -m transcriptome --cpu ${BUSCO_THREADS} -o run_${RUNOUT}.ORP --config ${BUSCO_CONFIG_FILE}
 	mv run_${RUNOUT}* ${DIR}/reports/
 	touch ${DIR}/reports/${RUNOUT}.busco.done
 

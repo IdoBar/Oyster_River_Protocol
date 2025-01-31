@@ -11,10 +11,10 @@ WORKDIR /build
 #########
 ### Setup the environment
 #########
-ENV DEBIAN_FRONTEND noninteractive
-ENV LC_ALL en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
 
 #########
 ### Aptitude packages
@@ -35,7 +35,7 @@ RUN useradd -r -s /bin/bash -U -m -d /home/orp -p '' orp
 #########
 ### Setup the user environment
 ########
-ENV HOME /home/orp
+ENV HOME=/home/orp
 RUN usermod -aG sudo orp \
     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 

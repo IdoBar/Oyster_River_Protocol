@@ -37,7 +37,7 @@ setup:
 conda:setup
 ifdef conda
 else
-	cd ${DIR}/software/anaconda && wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+	cd ${DIR}/software/anaconda && wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/download/24.11.3-0/Miniforge3-24.11.3-0-Linux-x86_64.sh"
 	cd ${DIR}/software/anaconda && bash Miniforge3.sh -b -p install/
 	@echo ". ${DIR}/software/anaconda/install/etc/profile.d/conda.sh" >> ~/.bashrc;
 	@echo ". ${DIR}/software/anaconda/install/etc/profile.d/mamba.sh" >> ~/.bashrc;

@@ -23,7 +23,7 @@ RUN apt update \
     && apt -y upgrade \
     && apt install -y --reinstall language-pack-en \
     && locale-gen en_US.UTF-8 \
-    && apt update && apt install -y build-essential git cmake python3 autoconf libbz2-dev liblzma-dev libxml2-dev libz-dev curl wget sudo nano \
+    && apt install -y build-essential git-all cmake python3 autoconf libbz2-dev liblzma-dev libxml2-dev libz-dev curl wget sudo nano \
     && apt -y autoremove
 
 
@@ -44,7 +44,13 @@ RUN usermod -aG sudo orp \
 #########
 WORKDIR /home/orp
 USER orp
-RUN git clone https://github.com/idobar/Oyster_River_Protocol.git && cd Oyster_River_Protocol && sudo make 
+RUN git config --global core.compression 0 \
+    && git clone --depth=1 http://github.com/idobar/Oyster_River_Protocol.git \
+    && cd /home/orp/Oyster_River_Protocol \
+    && git fetch --depth=10 && git fetch --depth=50 && git fetch --depth=100 \
+    && git fetch --depth=500 && git fetch --unshallow \
+    && sudo make 
+
 
 #########
 ### Path

@@ -23,7 +23,7 @@ diamond_data := $(shell ls ${DIR}/software/diamond/uniprot_sprot.fasta 2>/dev/nu
 busco_data := $(shell ls ${DIR}/busco_dbs/eukaryota_odb10 2>/dev/null)
 conda := $(shell conda info 2>/dev/null)
 orp := $(shell ${DIR}/software/anaconda/install/bin/conda info --envs | grep orp 2>/dev/null)
-VERSION := ${shell cat  ${MAKEDIR}version.txt}
+VERSION := ${shell cat  ${MAKEDIR}/version.txt}
 
 all: setup conda orp orthofuser transrate diamond_data busco_data postscript
 
@@ -37,9 +37,10 @@ setup:
 conda:setup
 ifdef conda
 else
-	cd ${DIR}/software/anaconda && curl -LO https://repo.anaconda.com/archive/Anaconda3-2020.11-Linux-x86_64.sh
-	cd ${DIR}/software/anaconda && bash Anaconda3-2020.11-Linux-x86_64.sh -b -p install/
+	cd ${DIR}/software/anaconda && wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/download/24.11.3-0/Miniforge3-24.11.3-0-Linux-x86_64.sh"
+	cd ${DIR}/software/anaconda && bash Miniforge3.sh -b -p install/
 	@echo ". ${DIR}/software/anaconda/install/etc/profile.d/conda.sh" >> ~/.bashrc;
+	@echo ". ${DIR}/software/anaconda/install/etc/profile.d/mamba.sh" >> ~/.bashrc;
 	@echo ". ${DIR}/software/anaconda/install/etc/profile.d/conda.sh" > pathfile;
 	source ~/.bashrc;
 endif
@@ -53,7 +54,6 @@ else
 				conda update -y -n base conda; \
 				conda config --add channels conda-forge; \
 				conda config --add channels bioconda; \
-				conda install mamba -n base -yc conda-forge; \
 				mamba create -yc bioconda --name orp_spades spades=3.15.2; \
 				mamba create -yc bioconda --name orp_trinity trinity=2.9.1 bwa=0.7.17 bashplotlib seqtk=1.3; \
 				mamba create -yc bioconda --name orp_busco busco=5.1.2; \
@@ -76,14 +76,14 @@ diamond_data:conda
 ifdef diamond_data
 		@echo "diamond_data is already installed"
 else
-		cd ${DIR}/software/diamond && curl -LO ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz && gzip -d uniprot_sprot.fasta.gz && ${DIR}/software/anaconda/install/envs/orp_diamond/bin/diamond makedb --in uniprot_sprot.fasta -d swissprot
+		cd ${DIR}/software/diamond && curl -LO https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz && gzip -d uniprot_sprot.fasta.gz && ${DIR}/software/anaconda/install/envs/orp_diamond/bin/diamond makedb --in uniprot_sprot.fasta -d swissprot
 endif
 
 busco_data:conda
 ifdef busco_data
 else
 	mkdir ${DIR}/busco_dbs && cd ${DIR}/busco_dbs
-	cd ${DIR}/busco_dbs && wget https://busco-data.ezlab.org/v5/data/lineages/eukaryota_odb10.2020-09-10.tar.gz && tar -zxf eukaryota_odb10.2020-09-10.tar.gz
+	cd ${DIR}/busco_dbs && wget https://busco-data.ezlab.org/v5/data/lineages/eukaryota_odb10.2024-01-08.tar.gz && tar -zxf eukaryota_odb10.2024-01-08.tar.gz
 endif
 
 transrate:
@@ -104,7 +104,7 @@ else
 endif
 else
 	@echo "orthofuser is not installed and needs to be installed"
-	cd ${DIR}/software && curl -LO https://github.com/davidemms/OrthoFinder/releases/download/2.5.2/OrthoFinder.tar.gz
+	cd ${DIR}/software && curl -LO https://github.com/davidemms/OrthoFinder/releases/download/2.5.5/OrthoFinder.tar.gz
 	cd ${DIR}/software/ && tar -zxf OrthoFinder.tar.gz
 	@echo PATH=\$$PATH:${DIR}/software/OrthoFinder/ >> pathfile
 endif

@@ -1,0 +1,10 @@
+name: orp_pre
+channels:
+  - bioconda
+  - conda-forge
+
+dependencies:
+  - rcorrector
+  - trimmomatic
+  - seqtk
+

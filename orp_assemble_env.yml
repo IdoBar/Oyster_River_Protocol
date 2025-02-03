@@ -1,0 +1,16 @@
+name: orp_assemble
+channels:
+  - bioconda
+  - conda-forge
+
+dependencies:
+  - spades
+  - trinity
+  - transabyss
+  - rcorrector
+  - trimmomatic
+  - seqtk 
+  - bashplotlib
+  - bwa
+  - samtools
+

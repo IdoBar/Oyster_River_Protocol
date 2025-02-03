@@ -30,7 +30,7 @@ buscopath := $(shell which run_BUSCO.py 2>/dev/null)
 transratepath := $(shell which transrate 2>/dev/null)
 BUSCO_CONFIG_FILE := ${MAKEDIR}/software/config.ini
 export BUSCO_CONFIG_FILE
-VERSION := ${shell cat  ${MAKEDIR}version.txt}
+VERSION := ${shell cat ${MAKEDIR}/version.txt}
 
 help:
 main: setup check welcome diamond busco transrate strandeval reportgen

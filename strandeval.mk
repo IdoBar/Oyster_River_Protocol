@@ -20,7 +20,7 @@ RUNOUT =
 ASSEMBLY=
 bwapath := $(shell which bwa 2>/dev/null)
 seqtkpath := $(shell which seqtk 2>/dev/null)
-VERSION := ${shell cat  ${MAKEDIR}version.txt}
+VERSION := ${shell cat ${MAKEDIR}/version.txt}
 
 
 help:

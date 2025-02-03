@@ -27,7 +27,7 @@ brewpath := $(shell which brew 2>/dev/null)
 rcorrpath := $(shell which rcorrector 2>/dev/null)
 trimmomaticpath := $(shell which trimmomatic 2>/dev/null)
 salmonpath := $(shell which salmon 2>/dev/null)
-VERSION := ${shell cat  ${MAKEDIR}version.txt}
+VERSION := ${shell cat ${MAKEDIR}/version.txt}
 
 
 check:

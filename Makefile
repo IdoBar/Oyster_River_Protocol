@@ -9,20 +9,20 @@ SHELL=/bin/bash -o pipefail
 
 MAKEDIR := $(dir $(firstword $(MAKEFILE_LIST)))
 DIR := ${CURDIR}
-CONDAROOT = ${DIR}/software/anaconda/install/
+CONDAROOT = ${DIR}/software/anaconda
 orthopath := $(shell ls ${DIR}/software/OrthoFinder/orthofinder/orthofuser.py 2>/dev/null)
 orthufuserversion = $(shell orthofuser.py --help | grep "OrthoFinder version" | awk '{print $$3}')
 transrate := $(shell ls ${DIR}/software/orp-transrate/transrate 2>/dev/null)
-transabysspath := $(shell which ${DIR}/software/transabyss/transabyss 2>/dev/null)
-transabyssversion = $(shell conda ${DIR}/software/anaconda/install/bin/activate orp 2>/dev/null; transabyss --version 2>/dev/null; conda deactivate 2> /dev/null)
-trinitypath := $(shell which ${DIR}/software/trinityrnaseq-v2.12.0/Trinity 2>/dev/null)
-trinityversion = $(shell ${DIR}/software/trinityrnaseq-v2.12.0/Trinity --version | awk '{print $$3}' | head -1 | awk -F 'v' '{print $$2}')
-spadespath := $(shell which ${DIR}/software/SPAdes-3.15.2-Linux/bin/spades.py 2>/dev/null)
-spadesversion = $(shell ${DIR}/software/SPAdes-3.15.2-Linux/bin/spades.py --version | awk -F 'v' '{print $$2}')
+# transabysspath := $(shell which ${DIR}/software/transabyss/transabyss 2>/dev/null)
+# transabyssversion = $(shell conda ${DIR}/software/anaconda/install/bin/activate orp 2>/dev/null; transabyss --version 2>/dev/null; conda deactivate 2> /dev/null)
+# trinitypath := $(shell which ${DIR}/software/trinityrnaseq-v2.12.0/Trinity 2>/dev/null)
+# trinityversion = $(shell ${DIR}/software/trinityrnaseq-v2.12.0/Trinity --version | awk '{print $$3}' | head -1 | awk -F 'v' '{print $$2}')
+# spadespath := $(shell which ${DIR}/software/SPAdes-3.15.2-Linux/bin/spades.py 2>/dev/null)
+# spadesversion = $(shell ${DIR}/software/SPAdes-3.15.2-Linux/bin/spades.py --version | awk -F 'v' '{print $$2}')
 diamond_data := $(shell ls ${DIR}/software/diamond/uniprot_sprot.fasta 2>/dev/null)
 busco_data := $(shell ls ${DIR}/busco_dbs/eukaryota_odb10 2>/dev/null)
 conda := $(shell conda info 2>/dev/null)
-orp := $(shell ${DIR}/software/anaconda/install/bin/conda info --envs | grep orp 2>/dev/null)
+orp := $(shell ${CONDAROOT}/bin/conda info --envs | grep orp 2>/dev/null)
 VERSION := ${shell cat  ${MAKEDIR}/version.txt}
 
 all: setup conda orp orthofuser transrate diamond_data busco_data postscript
@@ -31,44 +31,41 @@ all: setup conda orp orthofuser transrate diamond_data busco_data postscript
 
 setup:
 	@mkdir -p ${DIR}/shared
-	@mkdir -p ${DIR}/software/anaconda
+	@mkdir -p ${DIR}/software
 	@mkdir -p ${DIR}/software/diamond
 
 conda:setup
 ifdef conda
 else
-	cd ${DIR}/software/anaconda && wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/download/24.11.3-0/Miniforge3-24.11.3-0-Linux-x86_64.sh"
-	cd ${DIR}/software/anaconda && bash Miniforge3.sh -b -p install/
-	@echo ". ${DIR}/software/anaconda/install/etc/profile.d/conda.sh" >> ~/.bashrc;
-	@echo ". ${DIR}/software/anaconda/install/etc/profile.d/mamba.sh" >> ~/.bashrc;
-	@echo ". ${DIR}/software/anaconda/install/etc/profile.d/conda.sh" > pathfile;
-	source ~/.bashrc;
+	cd ${DIR}/software && wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/download/24.11.3-0/Miniforge3-24.11.3-0-Linux-x86_64.sh"
+	cd ${DIR}/software && bash Miniforge3.sh -b -p ${CONDAROOT}
+#	@echo ". ${CONDAROOT}/etc/profile.d/conda.sh" >> ~/.bashrc;
+#	@echo ". ${CONDAROOT}/etc/profile.d/mamba.sh" >> ~/.bashrc;
+	@echo ". ${CONDAROOT}/etc/profile.d/conda.sh" > pathfile
+	source ~/.bashrc
 endif
 
 orp:orp_env.yml conda setup
 ifdef orp
 else
 	( \
-				source ${DIR}/software/anaconda/install/etc/profile.d/conda.sh; \
-				conda activate; \
-				conda update -y -n base conda; \
-				conda config --add channels conda-forge; \
-				conda config --add channels bioconda; \
-				mamba create -yc bioconda --name orp_spades spades=3.15.2; \
-				mamba create -yc bioconda --name orp_trinity trinity=2.9.1 bwa=0.7.17 bashplotlib seqtk=1.3; \
-				mamba create -yc bioconda --name orp_busco busco=5.1.2; \
-				mamba create -yc bioconda --name orp_transabyss transabyss=2.0.1; \
-				mamba create -yc bioconda --name orp_rcorrector rcorrector=1.0.4; \
-				mamba create -yc bioconda --name orp_trimmomatic trimmomatic=0.39; \
-				mamba create -yc bioconda --name orp_sam samtools=1.12 bwa=0.7.17 seqtk=1.3; \
-				mamba create -yc bioconda --name orp_salmon salmon=1.4.0; \
-				mamba create -yc bioconda --name orp_cdhit cd-hit=4.6.8; \
-				mamba create -yc bioconda --name orp_diamond diamond=2.0.8; \
-				mamba env create -f ${DIR}/orp_env.yml python=3.8; \
-				mamba clean -ya; \
-				conda deactivate; \
+				source ${CONDAROOT}/etc/profile.d/conda.sh
+				conda activate 
+				conda config --set solver libmamba
+				conda config --add channels conda-forge
+				conda config --add channels bioconda
+				mamba update -y -n base conda
+				mamba env create  -f ${DIR}/orp_env.yml
+# 				mamba clean -ya
+				mamba env create  -f ${DIR}/orp_assemble_env.yml
+#				mamba clean -ya
+				mamba env create  -f ${DIR}/orp_pre_env.yml
+#				mamba clean -ya
+				mamba env create  -f ${DIR}/orp_post_env.yml
+				mamba clean -ya
+				conda deactivate
   )
-	@echo PATH=\$$PATH:${DIR}/software/anaconda/install/bin >> pathfile;
+	@echo PATH=\$$PATH:${CONDAROOT}/bin >> pathfile
 endif
 
 
@@ -76,14 +73,14 @@ diamond_data:conda
 ifdef diamond_data
 		@echo "diamond_data is already installed"
 else
-		cd ${DIR}/software/diamond && curl -LO https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz && gzip -d uniprot_sprot.fasta.gz && ${DIR}/software/anaconda/install/envs/orp_diamond/bin/diamond makedb --in uniprot_sprot.fasta -d swissprot
+		cd ${DIR}/software/diamond && aria2c -x5 https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz && gzip -d uniprot_sprot.fasta.gz && ${CONDAROOT}/envs/orp_post/bin/diamond makedb --in uniprot_sprot.fasta -d swissprot
 endif
 
 busco_data:conda
 ifdef busco_data
 else
 	mkdir ${DIR}/busco_dbs && cd ${DIR}/busco_dbs
-	cd ${DIR}/busco_dbs && wget https://busco-data.ezlab.org/v5/data/lineages/eukaryota_odb10.2024-01-08.tar.gz && tar -zxf eukaryota_odb10.2024-01-08.tar.gz
+	cd ${DIR}/busco_dbs && aria2c -x5 https://busco-data.ezlab.org/v5/data/lineages/eukaryota_odb10.2024-01-08.tar.gz && tar -zxf eukaryota_odb10.2024-01-08.tar.gz
 endif
 
 transrate:
@@ -104,7 +101,7 @@ else
 endif
 else
 	@echo "orthofuser is not installed and needs to be installed"
-	cd ${DIR}/software && curl -LO https://github.com/davidemms/OrthoFinder/releases/download/2.5.5/OrthoFinder.tar.gz
+	cd ${DIR}/software && aria2c -x5 https://github.com/davidemms/OrthoFinder/releases/download/2.5.2/OrthoFinder.tar.gz
 	cd ${DIR}/software/ && tar -zxf OrthoFinder.tar.gz
 	@echo PATH=\$$PATH:${DIR}/software/OrthoFinder/ >> pathfile
 endif
@@ -123,7 +120,7 @@ postscript: setup orp diamond_data busco_data orthofuser conda transrate
 	fi
 
 clean:
-	${DIR}/software/anaconda/install/bin/conda remove -y --name orp --all
+	${CONDAROOT}/bin/conda remove -y --name orp --all
 	rm -fr ${DIR}/software/anaconda/install
 	rm -fr ${DIR}/software/OrthoFinder/
 	rm -fr ${DIR}/software/orp-transrate

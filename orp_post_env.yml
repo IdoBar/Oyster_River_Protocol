@@ -1,0 +1,12 @@
+name: orp_post
+channels:
+  - bioconda
+  - conda-forge
+
+dependencies:
+  - sra-tools
+  - blast
+  - busco
+  - salmon
+  - cd-hit
+  - diamond

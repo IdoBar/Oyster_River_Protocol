@@ -1,4 +1,4 @@
-git
+.git
 .gitignore
 node_modules
 npm-debug.log
@@ -8,5 +8,4 @@ README.md
 LICENSE
 .vscode
 manuscript/
-Makefile
 .DS_Store
